@@ -1,0 +1,22 @@
+{
+  "name": "safe-money",
+  "version": "1.0.0",
+  "description": "safe-money in typescript, based on: https://ren.zone/articles/safe-money",
+  "scripts": {
+    "test": "ava -v"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "ava": "^3.5.2",
+    "ts-node": "^8.8.1",
+    "typescript": "3.8.3"
+  },
+  "ava": {
+    "extensions": [
+      "ts"
+    ],
+    "require": [
+      "ts-node/register"
+    ]
+  }
+}
