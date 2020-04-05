@@ -1,6 +1,6 @@
 {
   "name": "safe-money",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "safe-money in typescript, based on: https://ren.zone/articles/safe-money",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
