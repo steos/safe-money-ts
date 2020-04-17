@@ -31,10 +31,7 @@ export const floor = <
   value: DenseVal,
   scale: Scale<Currency, Unit>
 ): [Discrete<Currency, Unit>, Dense<Currency>] => {
-  const [num, denom] = value.value
-    .mul(scale.ratio)
-    .normalize()
-    .asTuple();
+  const [num, denom] = value.value.mul(scale.ratio).normalize().asTuple();
   const neg = num < 0;
   const absNum = neg ? -num : num;
   const x = absNum / denom;
@@ -44,7 +41,7 @@ export const floor = <
   const remVal = Rational.of(rem, mag).div(scale.ratio);
   return [
     Discrete.of(neg ? -absVal : absVal, scale),
-    Dense.of(neg ? scale.ratio.inverse().sub(remVal) : remVal, scale.currency)
+    Dense.of(neg ? scale.ratio.inverse().sub(remVal) : remVal, scale.currency),
   ];
 };
 
@@ -56,30 +53,20 @@ export const ceil = <
   value: DenseVal,
   scale: Scale<Currency, Unit>
 ): [Discrete<Currency, Unit>, Dense<Currency>] => {
-  const [num, denom] = value.value
-    .mul(scale.ratio)
-    .normalize()
-    .asTuple();
+  const [num, denom] = value.value.mul(scale.ratio).normalize().asTuple();
   const neg = num < 0;
   const absNum = neg ? -num : num;
   const x = absNum / denom;
   const rem = absNum - x * denom;
   const absVal = !neg && rem > 0 ? x + BigInt(1) : x;
   const mag = Math.pow(10, rem.toString().length);
-  const remVal = Rational.of(rem, mag)
-    .div(scale.ratio)
-    .mul(Rational.nat(-1));
+  const remVal = Rational.of(rem, mag).div(scale.ratio).mul(Rational.nat(-1));
   return [
     Discrete.of(neg ? -absVal : absVal, scale),
     Dense.of(
-      !neg && rem > 0
-        ? scale.ratio
-            .inverse()
-            .negate()
-            .sub(remVal)
-        : remVal,
+      !neg && rem > 0 ? scale.ratio.inverse().negate().sub(remVal) : remVal,
       scale.currency
-    )
+    ),
   ];
 };
 
@@ -91,29 +78,21 @@ export const round = <
   value: DenseVal,
   scale: Scale<Currency, Unit>
 ): [Discrete<Currency, Unit>, Dense<Currency>] => {
-  const [num, denom] = value.value
-    .mul(scale.ratio)
-    .normalize()
-    .asTuple();
+  const [num, denom] = value.value.mul(scale.ratio).normalize().asTuple();
   const neg = num < 0;
   const absNum = neg ? -num : num;
   const x = absNum / denom;
   const rem = absNum - x * denom;
   const remStr = rem.toString();
-  const down = parseInt(remStr[0], 10) < 5;
-  const absVal = !down || (neg && rem > 0) ? x + BigInt(1) : x;
+  const sig = parseInt(remStr[0], 10);
+  const absVal = sig >= 5 ? x + BigInt(1) : x;
   const mag = Math.pow(10, remStr.length);
   const remVal = Rational.of(rem, mag).div(scale.ratio);
   return [
     Discrete.of(neg ? -absVal : absVal, scale),
     Dense.of(
-      !down || neg
-        ? scale.ratio
-            .inverse()
-            .sub(remVal)
-            .mul(Rational.nat(!down ? -1 : 1))
-        : remVal,
+      sig >= 5 ? scale.ratio.inverse().sub(remVal) : remVal,
       scale.currency
-    )
+    ).mul(Rational.nat((sig < 5 && neg) || (sig >= 5 && !neg) ? -1 : 1)),
   ];
 };
