@@ -6,7 +6,7 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
-    "test": "ava -v",
+    "test": "ava src/* -v --timeout=1m",
     "prepublish": "tsc",
     "build": "tsc"
   },

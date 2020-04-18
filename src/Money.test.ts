@@ -3,6 +3,7 @@ import * as Money from "./Money";
 import Rational from "./Rational";
 import Dense from "./Dense";
 import Discrete from "./Discrete";
+import { spawn } from "child_process";
 
 const eurToUsd = Money.exchangeRate("EUR", "USD", Rational.fromDecimal("1.12"));
 
@@ -150,4 +151,73 @@ test("CHF Rappen rounding", (t) => {
   [val, rem] = Money.round(Dense.fromDecimal("150.32167", "CHF"), scale);
   t.is(val.dense().toDecimal(), "150.3");
   t.is(rem.value.toDecimal(), "0.02167");
+});
+
+type TscProcResult = {
+  status: number | null;
+  output: string;
+};
+
+const tsc = (file: string): Promise<TscProcResult> =>
+  new Promise((resolve) => {
+    const proc = spawn("yarn", ["tsc", file, "--noEmit"], { shell: true });
+    let output = "";
+    proc.stdout.on("data", (data) => (output += data));
+    proc.stderr.on("data", (data) => (output += data));
+    proc.on("close", (status) => resolve({ status, output }));
+  });
+
+test("dense currency mismatch", async (t) => {
+  let x = await tsc("test/dense-currency-mismatch.ts");
+  t.assert(
+    x.output.includes(
+      `Argument of type 'Dense<"USD">' is not assignable to parameter of type 'Dense<"EUR">'`
+    )
+  );
+  t.not(x.status, null);
+  t.not(x.status, 0);
+});
+
+test("discrete currency mismatch", async (t) => {
+  let x = await tsc("test/discrete-currency-mismatch.ts");
+  t.assert(
+    x.output.includes(
+      `Argument of type 'Discrete<"USD", "cent">' is not assignable to parameter of type 'Discrete<"EUR", "cent">'`
+    )
+  );
+  t.not(x.status, null);
+  t.not(x.status, 0);
+});
+
+test("discrete unit mismatch", async (t) => {
+  let x = await tsc("test/discrete-unit-mismatch.ts");
+  t.assert(
+    x.output.includes(
+      `Argument of type 'Discrete<"EUR", "euro">' is not assignable to parameter of type 'Discrete<"EUR", "cent">'`
+    )
+  );
+  t.not(x.status, null);
+  t.not(x.status, 0);
+});
+
+test("exchange currency mismatch", async (t) => {
+  let x = await tsc("test/exchange-currency-mismatch.ts");
+  t.assert(
+    x.output.includes(
+      `Argument of type 'Dense<"USD">' is not assignable to parameter of type 'Dense<"EUR">'`
+    )
+  );
+  t.not(x.status, null);
+  t.not(x.status, 0);
+});
+
+test("floor currency mismatch", async (t) => {
+  let x = await tsc("test/floor-currency-mismatch.ts");
+  t.assert(
+    x.output.includes(
+      `Argument of type 'Dense<"EUR">' is not assignable to parameter of type 'Dense<"USD">'`
+    )
+  );
+  t.not(x.status, null);
+  t.not(x.status, 0);
 });
