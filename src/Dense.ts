@@ -1,5 +1,19 @@
 import Rational from "./Rational";
 
+/**
+ * A dense monetary value.
+ *
+ * Dense values can represent arbitrary fractions of currency units.
+ *
+ * Dense instances are immutable.
+ *
+ * ```
+ * const a = Dense.fromDecimal("1.337", "EUR");
+ * const b = Dense.fromDecimal("1.337", "USD");
+ *
+ * a.add(b); // type error, USD is not assignable to EUR
+ * ```
+ */
 export default class Dense<Currency extends string> {
   public readonly value: Rational;
   public readonly currency: Currency;
@@ -28,6 +42,7 @@ export default class Dense<Currency extends string> {
   div(x: Rational): Dense<Currency> {
     return new Dense<Currency>(this.value.div(x), this.currency);
   }
+
   toDecimal() {
     return this.value.toDecimal();
   }
