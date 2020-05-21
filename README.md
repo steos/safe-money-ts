@@ -6,7 +6,7 @@ An implementation of [safe-money](https://ren.zone/articles/safe-money) in types
 
 ## Documentation
 
-- [API Reference](//steos.github.io/safe-money-ts)
+- [API Reference](//steos.github.io/safe-money-ts/)
 
 ### Getting started
 
