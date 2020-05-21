@@ -112,6 +112,20 @@ export default class Discrete<Currency extends string, Unit extends string> {
   }
 
   /**
+   * increments this value
+   */
+  increment() {
+    return new Discrete(this.value + BigInt(1), this.scale);
+  }
+
+  /**
+   * decrements this value
+   */
+  decrement() {
+    return new Discrete(this.value - BigInt(1), this.scale);
+  }
+
+  /**
    * creates a dense representation of this value
    */
   dense(): Dense<Currency> {

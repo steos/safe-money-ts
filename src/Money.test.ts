@@ -137,6 +137,12 @@ test("rounds negative down to EUR cent with remainder", (t) => {
   t.is(rem.value.toDecimal(), "-0.001");
 });
 
+test("rounds with exact result", (t) => {
+  const [val, rem] = Money.round(Dense.fromDecimal("0.01", "EUR"), eurCent);
+  t.is(val.value.toString(), "1");
+  t.is(rem.value.toDecimal(), "0.0");
+});
+
 test("CHF Rappen rounding", (t) => {
   const scale = Discrete.scale("CHF", "5-rappen", Rational.nat(20));
 
