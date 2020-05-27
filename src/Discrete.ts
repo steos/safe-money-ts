@@ -134,4 +134,11 @@ export default class Discrete<Currency extends string, Unit extends string> {
       this.scale.currency
     );
   }
+
+  /**
+   * formats this discrete value as a decimal string
+   */
+  toDecimal(): string {
+    return this.dense().toDecimal();
+  }
 }
