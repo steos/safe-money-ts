@@ -1,5 +1,7 @@
 # safe-money
 
+[![Build Status](https://travis-ci.org/steos/safe-money-ts.svg?branch=master)](https://travis-ci.org/steos/safe-money-ts)
+
 An implementation of [safe-money](https://ren.zone/articles/safe-money) in typescript.
 
 > WARNING: This is still in alpha. Not recommended for production.
