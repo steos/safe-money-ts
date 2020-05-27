@@ -25,12 +25,20 @@ yarn add safe-money
 Dense values can represent arbitrary fractions of currency units.
 
 ```ts
-import { Dense } from "safe-money";
+import { Dense, Rational } from "safe-money";
 
-const a = Dense.fromDecimal("0.2", "EUR");
-const b = Dense.fromDecimal("0.1", "USD");
+// exact arithmetic
+Dense.fromDecimal("0.2", "EUR")
+  .add(Dense.fromDecimal("0.1", "EUR"))
+  .toDecimal(); // "0.3"
 
-a.add(b); // type error
+// based on rationals
+const x = Dense.of(Rational.of(1, 3));
+x.toDecimal(); // "0.333333333333"
+x.mul(Rational.nat(3)).toDecimal(); // "1.0"
+
+// mixing currencies raises a type error
+Dense.fromDecimal("10", "EUR").add(Dense.fromDecimal("10", "USD")); // USD is not assignable to EUR
 ```
 
 #### Discrete values
@@ -43,12 +51,14 @@ The scale is the ratio between the chosen unit and the main currency unit.
 ```ts
 import { Discrete, Rational } from "safe-money";
 
-const euroCent = Discrete.scale("EUR", "cent", Rational.of(100, 1));
-const euro = Discrete.scale("EUR", "euro", Rational.of(1, 1));
-const usdCent = Discrete.scale("USD", "cent", Rational.nat(100));
+const euroCent = Discrete.scale("EUR", "cent", Rational.of(100, 1)); // 100 cents in 1 euro
+const euro = Discrete.scale("EUR", "euro", Rational.of(1, 1)); // 1 euro in 1 euro
+const usdCent = Discrete.scale("USD", "cent", Rational.nat(100)); // 100 cents in 1 dollar
+
+Discrete.of(1337, euroCent).dense().toDecimal(); // "13.37"
 
 Discrete.of(42, euroCent).add(Discrete.of(1, usdCent)); // type error
-Discrete.of(42, euroCent).add(Discrete.of(23, euro)); // type error
+Discrete.of(1137, euroCent).add(Discrete.of(23, euro)); // type error
 ```
 
 #### Conversions
@@ -70,7 +80,17 @@ To convert a dense value to a discrete value you can use `floor`, `ceil` or `rou
 Those operations will return the closest discrete value and a dense remainder.
 
 ```ts
-Money.floor(Dense.fromDecimal("1", "EUR"), usdCent); // type error
+const x = Dense.fromDecimal("1.337", "EUR");
+const [value, remainder] = Money.round(x, euroCent);
+value.toDecimal(); // "1.34"
+remainder.toDecimal(); // "-0.003"
+
+const [value, remainder] = Money.floor(x, euroCent);
+value.toDecimal(); // "1.33"
+remainder.toDecimal(); // "0.007"
+
+// mismatched units raise a type error
+Money.floor(Dense.fromDecimal("1", "EUR"), usdCent);
 ```
 
 ## License
