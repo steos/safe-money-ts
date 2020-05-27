@@ -147,7 +147,7 @@ export default class Rational {
       fractional.push(x);
       rem = (rem - denom * x) * BigInt(10);
     }
-    return sign + [integral, fractional.join("") || "0"].join(separator);
+    return [sign, integral, separator, fractional.join("") || "0"].join("");
   }
 
   /**
