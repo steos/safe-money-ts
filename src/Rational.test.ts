@@ -22,6 +22,7 @@ test("rounds when converting to decimal string", (t) => {
   t.is(Ratio.of(4, 1000).toDecimal({ round: true, decimals: 2 }), "0.00");
   t.is(Ratio.of(55, 1000).toDecimal({ round: true, decimals: 2 }), "0.06");
   t.is(Ratio.of(54, 1000).toDecimal({ round: true, decimals: 2 }), "0.05");
+  t.is(Ratio.of(2, 3).toDecimal({ round: true, decimals: 4 }), "0.6667");
 });
 
 test("parses decimal string", (t) => {
