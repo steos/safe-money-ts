@@ -135,17 +135,44 @@ export default class Rational {
   /**
    * formats this rational as decimal string
    */
-  public toDecimal({ separator = ".", decimals = 12 } = {}) {
+  public toDecimal({ separator = ".", decimals = 12, round = false } = {}) {
     const [num, denom] = this.normalize().asTuple();
     const sign = num < 0 ? "-" : "";
     const absNum = num < 0 ? -num : num;
-    const integral = absNum / denom;
+    let integral = absNum / denom;
     let rem = (absNum - denom * integral) * BigInt(10);
     const fractional: bigint[] = [];
     while (rem > 0 && fractional.length < decimals) {
       const x = rem / denom;
       fractional.push(x);
       rem = (rem - denom * x) * BigInt(10);
+    }
+    if (round) {
+      const nextFract = rem / denom;
+      if (nextFract > BigInt(4)) {
+        const lastIndex = fractional.length - 1;
+        const lastFractional = fractional[lastIndex];
+        if (lastFractional === BigInt(9)) {
+          if (lastIndex === 0) {
+            integral += BigInt(1);
+            fractional.length = 0;
+          } else {
+            let index = lastIndex;
+            while (index > 0 && fractional[index] === BigInt(9)) {
+              index--;
+            }
+            if (index === 0 && fractional[index] === BigInt(9)) {
+              integral += BigInt(1);
+              fractional.length = 0;
+            } else {
+              fractional[index] += BigInt(1);
+              fractional.length = index + 1;
+            }
+          }
+        } else if (nextFract > BigInt(4)) {
+          fractional[lastIndex] = lastFractional + BigInt(1);
+        }
+      }
     }
     return [sign, integral, separator, fractional.join("") || "0"].join("");
   }
